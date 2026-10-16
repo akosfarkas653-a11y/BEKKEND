@@ -11,7 +11,7 @@ export const sequelize = new Sequelize({
 export async function connectDB() {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ force: true });
+    await sequelize.sync(); //{ force: true }, { alter: true }
     console.log('✅ SQLite adatbázis kapcsolat sikeresen felépült.');
   } catch (error) {
     console.error('❌ Nem sikerült csatlakozni az SQLite adatbázishoz:', error);

@@ -1,11 +1,10 @@
 import express from 'express';
 import path from 'path';
 import { connectDB } from './db.js';
-import { User } from './models/User.js';
-import { Task } from './models/Task.js';
-import { UserTask } from './models/UserTask.js';
 import { checkEmptyTable as checkEmptyUsersTable } from './z_dummy_data/users_dummy.js';
 import { checkEmptyTable as checkEmptyTasksTable } from './z_dummy_data/tasks_dummy.js';
+import * as userController from './controller/userController.js';
+import * as taskController from './controller/taskController.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,51 +34,24 @@ app.get('/', (req, res) => {
   res.json({ message: 'Express szerver sikeresen fut!' });
 });
 
+// --- API Útvonalak (A kérések kezelését a Controller réteg végzi) ---
+
+// Bejelentkezés végpont
+app.post('/api/login', userController.login);
+
 // Felhasználók lekérdezése
-app.get('/api/users', async (req, res) => {
-  try {
-    const users = await User.findAll();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Nem sikerült lekérni a felhasználókat.' });
-  }
-});
+app.get('/api/users', userController.getUsers);
 
 // Feladatok lekérdezése
-app.get('/api/tasks', async (req, res) => {
-  try {
-    const tasks = await Task.findAll();
-    res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ error: 'Nem sikerült lekérni a feladatokat.' });
-  }
-});
+app.get('/api/tasks', taskController.getTasks);
 
-// Kapcsolótábla lekérdezése: Taskonként egy tömbben a hozzájuk rendelt felhasználók
-app.get('/api/taskusers', async (req, res) => {
-  try {
-    const tasksWithUsers = await Task.findAll({
-      attributes: ['id', 'title'],
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'firstName', 'lastName'],
-          through: {
-            attributes: [], // Ne tartalmazza a UserTasks kapcsolótábla mezőit
-          },
-        },
-      ],
-    });
-    res.json(tasksWithUsers);
-  } catch (error) {
-    res.status(500).json({ error: 'Nem sikerült lekérni a feladatokhoz rendelt felhasználókat.' });
-  }
-});
+// Feladatok és hozzájuk rendelt felhasználók lekérdezése (Védett végpont, autentikáció a Service rétegben)
+app.get('/api/taskusers', taskController.getTaskUsers);
 
+// Szerver indítása és adatbázis kapcsolat
 app.listen(PORT, async () => {
   await connectDB();
   await checkEmptyUsersTable();
   await checkEmptyTasksTable();
   console.log(`Szerver elindult a http://localhost:${PORT} címen`);
 });
-
