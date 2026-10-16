@@ -28,9 +28,17 @@ export async function findByCredentials(email, password) {
   return await User.findOne({ where: { email, password } });
 }
 
+/**
+ * Új felhasználó létrehozása az adatbázisban.
+ */
+export async function create(userData) {
+  return await User.create(userData);
+}
+
 export default {
   findAll,
   findById,
   findByEmail,
   findByCredentials,
+  create,
 };

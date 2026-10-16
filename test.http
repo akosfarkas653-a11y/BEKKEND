@@ -30,4 +30,16 @@ Authorization: Bearer e1c68273-09ad-4ae3-b236-903867eb5b13
 ### Kapcsolótábla lekérdezése tokennel query paraméterként
 # GET http://localhost:3000/api/taskusers?token=ILLUSD_IDE_A_TOKENT
 
+### Új felhasználó létrehozása (POST /api/users vagy /api/createuser)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Gábor",
+  "lastName": "Kovács",
+  "email": "gabor.kovacs@example.com",
+  "birthYear": 1995,
+  "password": "password123"
+}
+
 

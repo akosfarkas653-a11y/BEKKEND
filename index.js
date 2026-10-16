@@ -42,6 +42,10 @@ app.post('/api/login', userController.login);
 // Felhasználók lekérdezése
 app.get('/api/users', userController.getUsers);
 
+// Új felhasználó létrehozása
+app.post('/api/users', userController.createUser);
+app.post('/api/createuser', userController.createUser);
+
 // Feladatok lekérdezése
 app.get('/api/tasks', taskController.getTasks);
 

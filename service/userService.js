@@ -57,9 +57,40 @@ export function verifyToken(token) {
   return activeTokens.get(token);
 }
 
+/**
+ * Új felhasználó létrehozása (üzleti logika).
+ * Ellenőrzi a kötelező mezőket és az email egyediségét, majd a repository-n keresztül létrehozza a rekordot.
+ */
+export async function createUser(userData) {
+  const { firstName, lastName, email, birthYear, password } = userData;
+
+  if (!firstName || !lastName || !email || !birthYear) {
+    const error = new Error('A firstName, lastName, email és birthYear megadása kötelező.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Ellenőrizzük, hogy létezik-e már felhasználó ezzel az email címmel
+  const existingUser = await userRepository.findByEmail(email);
+  if (existingUser) {
+    const error = new Error('Ezzel az email címmel már létezik felhasználó.');
+    error.statusCode = 409;
+    throw error;
+  }
+
+  return await userRepository.create({
+    firstName,
+    lastName,
+    email,
+    birthYear,
+    password: password || 'password123',
+  });
+}
+
 export default {
   getAllUsers,
   getUserById,
   login,
   verifyToken,
+  createUser,
 };

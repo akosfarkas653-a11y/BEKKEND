@@ -47,8 +47,23 @@ export function authenticateToken(req, res, next) {
   next();
 }
 
+/**
+ * Új felhasználó létrehozása HTTP POST kérésre.
+ */
+export async function createUser(req, res) {
+  try {
+    const newUser = await userService.createUser(req.body);
+    res.status(201).json(newUser);
+  } catch (error) {
+    const status = error.statusCode || 500;
+    const message = error.statusCode ? error.message : 'Nem sikerült létrehozni a felhasználót.';
+    res.status(status).json({ error: message });
+  }
+}
+
 export default {
   login,
   getUsers,
+  createUser,
   authenticateToken,
 };
